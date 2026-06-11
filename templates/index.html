@@ -34,7 +34,6 @@
     .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
     .header p { color: rgba(255,255,255,0.55); margin-top: 8px; font-size: 14px; }
 
-    /* Drop zone */
     .drop-zone {
       border: 2px dashed rgba(255,255,255,0.25);
       border-radius: 16px;
@@ -55,7 +54,6 @@
     .drop-zone .dz-text { color: rgba(255,255,255,0.65); font-size: 14px; }
     .drop-zone .dz-text span { color: #a89fff; font-weight: 600; }
 
-    /* Preview */
     #preview-wrap {
       display: none;
       margin-top: 20px;
@@ -73,7 +71,6 @@
       font-size: 16px; cursor: pointer; line-height: 32px; text-align: center;
     }
 
-    /* Predict button */
     #predict-btn {
       margin-top: 20px;
       width: 100%;
@@ -91,7 +88,6 @@
     #predict-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,107,255,0.4); }
     #predict-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    /* Result */
     #result-box {
       display: none;
       margin-top: 24px;
@@ -106,13 +102,11 @@
     #result-box .res-label { font-size: 26px; font-weight: 700; margin: 8px 0 4px; }
     #result-box .res-conf  { font-size: 14px; color: rgba(255,255,255,0.65); }
 
-    /* Confidence bar */
     .conf-bar-wrap { margin-top: 14px; background: rgba(255,255,255,0.1); border-radius: 99px; height: 8px; overflow: hidden; }
     .conf-bar { height: 100%; border-radius: 99px; transition: width 1s ease; }
     .cat .conf-bar { background: linear-gradient(90deg, #ff9500, #ff3b30); }
     .dog .conf-bar { background: linear-gradient(90deg, #34c759, #007aff); }
 
-    /* Error */
     #error-box {
       display: none;
       margin-top: 16px;
@@ -145,7 +139,6 @@
     <p>Upload an image and the CNN will predict in real-time</p>
   </div>
 
-  <!-- Drop zone -->
   <div class="drop-zone" id="drop-zone">
     <input type="file" id="file-input" accept="image/png,image/jpeg" />
     <div class="dz-icon">📁</div>
@@ -159,13 +152,10 @@
     <button id="clear-btn" title="Remove image">✕</button>
   </div>
 
-  <!-- Predict button -->
   <button id="predict-btn">Classify Image</button>
 
-  <!-- Error -->
   <div id="error-box"></div>
 
-  <!-- Result -->
   <div id="result-box">
     <div class="res-emoji" id="res-emoji"></div>
     <div class="res-label" id="res-label"></div>
