@@ -11,7 +11,7 @@ app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB limit
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # Load your trained model (update path as needed)
-MODEL_PATH = 'model/cnn_cat_dog.keras'
+MODEL_PATH = 'model/cnn_cat_dog.h5'
 model = None
 
 def load_trained_model():
