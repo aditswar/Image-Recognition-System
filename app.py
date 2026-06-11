@@ -25,7 +25,7 @@ def load_trained_model():
     x = tf.keras.layers.Dense(128, activation='relu')(x)
     outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
     model = tf.keras.Model(inputs, outputs)
-    model.load_weights('model/weights.h5')
+    model.load_weights('model/weights.weights.h5')
     print("✅ Model loaded successfully.")
 
 def allowed_file(filename):
