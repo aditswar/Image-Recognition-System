@@ -11,7 +11,6 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# Load your trained model (update path as needed)
 MODEL_PATH = 'model/cnn_cat_dog.h5'
 model = None
 
