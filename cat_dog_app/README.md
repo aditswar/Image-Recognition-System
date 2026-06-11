@@ -1,21 +1,7 @@
 # Cat vs Dog Classifier — Flask App
 
-## Folder structure
-```
-cat_dog_app/
-├── app.py               # Flask backend
-├── save_model.py        # Helper to save your trained model
-├── requirements.txt
-├── model/
-│   └── cnn_cat_dog.h5   # ← place your saved model here
-├── static/
-│   └── uploads/         # uploaded images stored here temporarily
-└── templates/
-    └── index.html       # UI
-```
-
 ## Setup
-
+Made a requirements file:
 ```bash
 pip install -r requirements.txt
 ```
