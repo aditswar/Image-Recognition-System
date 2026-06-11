@@ -16,11 +16,17 @@ model = None
 
 def load_trained_model():
     global model
-    if os.path.exists(MODEL_PATH):
-        model = load_model(MODEL_PATH)
-        print("✅ Model loaded successfully.")
-    else:
-        print(f"⚠️  Model not found at '{MODEL_PATH}'. Train & save your model first.")
+    inputs = tf.keras.Input(shape=(64, 64, 3))
+    x = tf.keras.layers.Conv2D(32, 3, activation='relu')(inputs)
+    x = tf.keras.layers.MaxPool2D(2, 2)(x)
+    x = tf.keras.layers.Conv2D(32, 3, activation='relu')(x)
+    x = tf.keras.layers.MaxPool2D(2, 2)(x)
+    x = tf.keras.layers.Flatten()(x)
+    x = tf.keras.layers.Dense(128, activation='relu')(x)
+    outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+    model = tf.keras.Model(inputs, outputs)
+    model.load_weights('model/weights.h5')
+    print("✅ Model loaded successfully.")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
