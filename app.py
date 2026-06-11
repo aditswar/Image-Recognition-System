@@ -4,12 +4,15 @@ import tensorflow as tf
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 from tensorflow.keras.preprocessing import image
+import tensorflow as tf
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+# Load your trained model (update path as needed)
+MODEL_PATH = 'model/cnn_cat_dog.h5'
 model = None
 
 def load_trained_model():
