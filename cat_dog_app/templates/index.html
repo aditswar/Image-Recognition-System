@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cat vs Dog Classifier</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      color: #fff;
+    }
+
+    .header { text-align: center; margin-bottom: 36px; }
+    .header .emoji { font-size: 52px; margin-bottom: 12px; display: block; }
+    .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    .header p { color: rgba(255,255,255,0.55); margin-top: 8px; font-size: 14px; }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed rgba(255,255,255,0.25);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #7c6bff;
+      background: rgba(124, 107, 255, 0.08);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-zone .dz-icon { font-size: 40px; margin-bottom: 12px; }
+    .drop-zone .dz-text { color: rgba(255,255,255,0.65); font-size: 14px; }
+    .drop-zone .dz-text span { color: #a89fff; font-weight: 600; }
+
+    /* Preview */
+    #preview-wrap {
+      display: none;
+      margin-top: 20px;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    #preview-wrap img {
+      width: 100%; max-height: 280px; object-fit: cover; border-radius: 16px; display: block;
+    }
+    #clear-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0,0,0,0.55); color: #fff; border: none;
+      border-radius: 50%; width: 32px; height: 32px;
+      font-size: 16px; cursor: pointer; line-height: 32px; text-align: center;
+    }
+
+    /* Predict button */
+    #predict-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #7c6bff, #9b59b6);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+    }
+    #predict-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,107,255,0.4); }
+    #predict-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Result */
+    #result-box {
+      display: none;
+      margin-top: 24px;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+    #result-box.cat  { background: linear-gradient(135deg, rgba(255,149,0,0.2), rgba(255,94,58,0.2)); border: 1px solid rgba(255,149,0,0.3); }
+    #result-box.dog  { background: linear-gradient(135deg, rgba(52,199,89,0.2), rgba(0,122,255,0.2)); border: 1px solid rgba(52,199,89,0.3); }
+    #result-box .res-emoji { font-size: 52px; }
+    #result-box .res-label { font-size: 26px; font-weight: 700; margin: 8px 0 4px; }
+    #result-box .res-conf  { font-size: 14px; color: rgba(255,255,255,0.65); }
+
+    /* Confidence bar */
+    .conf-bar-wrap { margin-top: 14px; background: rgba(255,255,255,0.1); border-radius: 99px; height: 8px; overflow: hidden; }
+    .conf-bar { height: 100%; border-radius: 99px; transition: width 1s ease; }
+    .cat .conf-bar { background: linear-gradient(90deg, #ff9500, #ff3b30); }
+    .dog .conf-bar { background: linear-gradient(90deg, #34c759, #007aff); }
+
+    /* Error */
+    #error-box {
+      display: none;
+      margin-top: 16px;
+      background: rgba(255,59,48,0.15);
+      border: 1px solid rgba(255,59,48,0.35);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: #ff6b6b;
+      text-align: center;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <span class="emoji">🐾</span>
+    <h1>Cat vs Dog Classifier</h1>
+    <p>Upload an image and the CNN will predict in real-time</p>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="image/png,image/jpeg" />
+    <div class="dz-icon">📁</div>
+    <p class="dz-text"><span>Click to browse</span> or drag & drop</p>
+    <p class="dz-text" style="margin-top:6px;">PNG / JPG · max 5 MB</p>
+  </div>
+
+  <!-- Preview -->
+  <div id="preview-wrap">
+    <img id="preview-img" src="" alt="Preview" />
+    <button id="clear-btn" title="Remove image">✕</button>
+  </div>
+
+  <!-- Predict button -->
+  <button id="predict-btn">Classify Image</button>
+
+  <!-- Error -->
+  <div id="error-box"></div>
+
+  <!-- Result -->
+  <div id="result-box">
+    <div class="res-emoji" id="res-emoji"></div>
+    <div class="res-label" id="res-label"></div>
+    <div class="res-conf"  id="res-conf"></div>
+    <div class="conf-bar-wrap"><div class="conf-bar" id="conf-bar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<script>
+  const fileInput   = document.getElementById('file-input');
+  const dropZone    = document.getElementById('drop-zone');
+  const previewWrap = document.getElementById('preview-wrap');
+  const previewImg  = document.getElementById('preview-img');
+  const clearBtn    = document.getElementById('clear-btn');
+  const predictBtn  = document.getElementById('predict-btn');
+  const resultBox   = document.getElementById('result-box');
+  const errorBox    = document.getElementById('error-box');
+
+  let selectedFile = null;
+
+  function showPreview(file) {
+    selectedFile = file;
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    previewWrap.style.display = 'block';
+    predictBtn.style.display  = 'block';
+    resultBox.style.display   = 'none';
+    errorBox.style.display    = 'none';
+  }
+
+  function reset() {
+    selectedFile = null;
+    fileInput.value = '';
+    previewWrap.style.display = 'none';
+    predictBtn.style.display  = 'none';
+    resultBox.style.display   = 'none';
+    errorBox.style.display    = 'none';
+  }
+
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) showPreview(e.target.files[0]); });
+  clearBtn.addEventListener('click', reset);
+
+  // Drag & drop
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) showPreview(f);
+  });
+
+  predictBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    predictBtn.disabled = true;
+    predictBtn.innerHTML = '<span class="spinner"></span>Classifying…';
+    resultBox.style.display = 'none';
+    errorBox.style.display  = 'none';
+
+    const form = new FormData();
+    form.append('file', selectedFile);
+
+    try {
+      const res  = await fetch('/predict', { method: 'POST', body: form });
+      const data = await res.json();
+
+      if (data.error) { showError(data.error); return; }
+
+      const isdog = data.prediction === 'Dog';
+      resultBox.className = 'isdog' ? 'dog' : isdog ? 'dog' : 'cat';  // reset class
+      resultBox.className = isdog ? 'dog' : 'cat';
+      document.getElementById('res-emoji').textContent = isdog ? '🐶' : '🐱';
+      document.getElementById('res-label').textContent = `It's a ${data.prediction}!`;
+      document.getElementById('res-conf').textContent  = `Confidence: ${data.confidence}%`;
+      resultBox.style.display = 'block';
+
+      // animate bar
+      requestAnimationFrame(() => {
+        document.getElementById('conf-bar').style.width = data.confidence + '%';
+      });
+
+    } catch (err) {
+      showError('Something went wrong. Is the Flask server running?');
+    } finally {
+      predictBtn.disabled = false;
+      predictBtn.innerHTML = 'Classify Image';
+    }
+  });
+
+  function showError(msg) {
+    errorBox.textContent = '⚠️ ' + msg;
+    errorBox.style.display = 'block';
+  }
+</script>
+</body>
+</html>
